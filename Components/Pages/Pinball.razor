@@ -13,6 +13,17 @@
 <button class="btn btn-primary" @onclick="findMe">Show my location</button>
 
 @code {
+    /* TODO:
+     *  - add inputs
+     *  - sort input binding
+     *  - add Geolocation
+     *  - test
+     *  - ???
+     *  - profit
+     * 
+     * */
+
+
     Location location = new();
     private void Submit()
     {
@@ -24,4 +35,11 @@
         public string Latitude  { get; set; }
         public string Longitude { get; set; }
     }
+
+    // Example API call: https://pinballmap.com/api/v1/locations/closest_by_lat_lon.json?lat=39.7213696&lon=-86.147072&max_distance=50&send_all_within_distance=1
+
+    // GeoLocation options:
+    // https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API
+    // https://darnton.co.nz/2020/11/29/geolocation-in-blazor/ & https://stackoverflow.com/questions/69428693/blazor-user-device-geolocation
+    // 
 }
