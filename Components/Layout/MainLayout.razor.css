@@ -4,6 +4,24 @@
     flex-direction: column;
 }
 
+/* Fix height and enable scrolling */
+.grid {
+    height: 16.5rem;
+    overflow-y: auto;
+}
+
+/* Sticky header while scrolling */
+::deep thead {
+    position: sticky;
+    top: 0;
+    background-color: #eee;
+}
+
+/* Subtle stripe effect */
+::deep tr:nth-child(even) {
+    background: rgba(255,255,255,0.4);
+}
+
 main {
     flex: 1;
 }

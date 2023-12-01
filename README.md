@@ -3,7 +3,7 @@
 ## About The Project
 
 ### Goals
-I wanted to play around with the new version of Blazor and .NET 8. 
+Learn Blazor. I haven't used it before and I wanted to play around with the new version and .NET 8. 
 
 ### Built With
 * [Blazor][Blazor-url]

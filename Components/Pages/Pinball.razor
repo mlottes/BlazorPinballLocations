@@ -9,121 +9,58 @@
 @inject IJSRuntime JS
 
 @rendermode InteractiveServer
+
 <PageTitle>Pinball Locator</PageTitle>
 
 <h1>Pinball Locator</h1>
 
-<h5>Latitude:  </h5>
-<input @bind="location.Latitude" />
-<h5>Longitude: </h5>
-<input @bind="location.Longitude" />
+<table>
+    <tr>
+        <td>
+            <h5>Latitude:  </h5>
+        </td>
+        <td>
+            <input @bind="@location.Latitude" @bind:event="oninput" />
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <h5>Longitude: </h5>
+        </td>
+        <td>
+            <input @bind="location.Longitude" @bind:event="oninput" />
+        </td>
+    </tr>
+</table>
 
 <br />
-<br />
 
-@if (pinballLocations.Any()/*!_display*/)
-{
-    <div class="grid">
-        <QuickGrid @key="pinballLocations" Items="@pinballLocations.AsQueryable()">
-            <PropertyColumn Property="@(p => p.id)" Sortable="true" />
-            <PropertyColumn Property="@(p => p.name)" Sortable="true" />
-            <PropertyColumn Property="@(p => p.street)" Sortable="true" />
-            <PropertyColumn Property="@(p => p.city)" Sortable="true" />
-            <PropertyColumn Property="@(p => p.state)" Sortable="true" />
-            <PropertyColumn Property="@(p => p.zip)" Sortable="true" />
-        </QuickGrid>
-    </div>
-}
-
-
-<br />
-<br />
-<button class="btn btn-primary" @onclick="Submit">Submit</button>
+<button class="btn btn-primary" @onclick="Submit">Search</button>
 <button class="btn btn-primary" @onclick="GetUserCoordinates">Near Me</button>
 
-@code {
-    Location location = new();
-    IList<PinballLocation> pinballLocations = new List<PinballLocation>();
+<br />
+<br />
 
-    private async Task Submit()
-    {        
-        pinballLocations.Clear();
-        pinballLocations = GetPinballLocations(await this.GetClosestMachinesByLatLon(location.Latitude, location.Longitude));
-    }
-
-    private async Task GetUserCoordinates()
+<div>
+    @if (pinballLocations is null)
     {
-        var service = new GeolocationService(JS);
-        var currentPositionResult = await service.GetCurrentPosition();
-        location.Latitude = currentPositionResult.Position.Coords.Latitude;
-        location.Longitude = currentPositionResult.Position.Coords.Longitude;
+        <p>Waiting for submission...</p>
     }
-
-    private async Task<string> GetClosestMachinesByLatLon(double latitude, double longitude)
+    else if (!pinballLocations.Any())
     {
-        var options = new JsonSerializerOptions
-             {
-                 PropertyNameCaseInsensitive = true
-             };
-        var requestMessage = new HttpRequestMessage()
-            {
-                Method = new HttpMethod("GET"),
-                RequestUri = new Uri($"https://pinballmap.com/api/v1/locations/closest_by_lat_lon.json?lat={latitude}&lon={longitude}&max_distance=50&send_all_within_distance=1")
-            };
-
-        var response = await Http.SendAsync(requestMessage);
-        var responseBody = await response.Content.ReadAsStringAsync();
-        return responseBody!;
+        <div><p>No locations found</p></div>
     }
-
-    private IList<PinballLocation> GetPinballLocations2(string json)
+    else if (pinballLocations.Any())
     {
-        using (JsonDocument document = JsonDocument.Parse(json))
-        {
-            if (!string.IsNullOrEmpty(json))
-            {
-                JsonElement root = document.RootElement;
-                JsonElement locationElement = root.GetProperty("locations");
-                foreach (JsonElement location in locationElement.EnumerateArray())
-                {
-                    pinballLocations.Add(JsonSerializer.Deserialize<PinballLocation>(location)!);
-                }
-
-                return pinballLocations;
-            }
-            else
-            {
-                return Enumerable.Empty<PinballLocation>().ToList();
-            }
-        }
+        <div class="grid">
+            <QuickGrid Items="@pinballLocations.AsQueryable()">
+                <PropertyColumn Property="@(p => p.id)" Sortable="true" />
+                <PropertyColumn Property="@(p => p.name)" Sortable="true" />
+                <PropertyColumn Property="@(p => p.street)" Sortable="true" />
+                <PropertyColumn Property="@(p => p.city)" Sortable="true" />
+                <PropertyColumn Property="@(p => p.state)" Sortable="true" />
+                <PropertyColumn Property="@(p => p.zip)" Sortable="true" />
+            </QuickGrid>
+        </div>
     }
-
-    private IList<PinballLocation> GetPinballLocations(string json)
-    {
-        using (JsonDocument document = JsonDocument.Parse(json))
-        {
-            if (string.IsNullOrEmpty(json))
-            {
-                return Enumerable.Empty<PinballLocation>().ToList();
-            }
-            else
-            {
-                JsonElement root = document.RootElement;
-                JsonElement locationElement = root.TryGetProperty(propertyName: "locations", out JsonElement value) ? value : new();
-                if (locationElement.ValueKind != JsonValueKind.Undefined)
-                {
-                    foreach (JsonElement location in locationElement.EnumerateArray())
-                    {
-                        pinballLocations.Add(JsonSerializer.Deserialize<PinballLocation>(location)!);
-                    }
-
-                    return pinballLocations;
-                }
-                else
-                {
-                    return Enumerable.Empty<PinballLocation>().ToList();
-                }
-            }
-        }
-    }
-}
+</div>
