@@ -5,14 +5,23 @@ namespace BlazorPinballLocations.Components.Pages
 {
     public partial class Pinball
     {
+        bool isSubmitting = false;
         Location location = new();
         IList<PinballLocation>? pinballLocations = null;
 
         private async Task Submit()
-        {               
-            pinballLocations = new List<PinballLocation>();
-            string matches = await GetClosestMachinesByLatLon(location.Latitude, location.Longitude);
-            pinballLocations = GetPinballLocations(matches);
+        {   
+            await Task.Delay(1); // Hacky, but necessary to flush changes without a refactor. See: https://stackoverflow.com/a/56675814/5308100
+            try
+            {
+                pinballLocations = new List<PinballLocation>();
+                string matches = await GetClosestMachinesByLatLon(location.Latitude, location.Longitude);
+                pinballLocations = GetPinballLocations(matches);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         // Services layer

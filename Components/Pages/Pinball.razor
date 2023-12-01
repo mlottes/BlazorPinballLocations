@@ -1,9 +1,7 @@
 ﻿@page "/pinball"
 
-@using Darnton.Blazor.DeviceInterop.Geolocation
-@using System.Text.Json
-@using System.Linq
 @using Microsoft.AspNetCore.Components.QuickGrid
+@using System.Linq
 
 @inject HttpClient Http
 @inject IJSRuntime JS
@@ -44,11 +42,11 @@
 <div>
     @if (pinballLocations is null)
     {
-        <p>Waiting for submission...</p>
+        <div><p>Waiting for submission...</p></div>
     }
     else if (!pinballLocations.Any())
     {
-        <div><p>No locations found</p></div>
+        <div @key="pinballLocations"><p>No locations found</p></div>
     }
     else if (pinballLocations.Any())
     {
