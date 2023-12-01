@@ -5,15 +5,14 @@ namespace BlazorPinballLocations.Components.Pages
 {
     public partial class Pinball
     {
-        //bool hasSubmit = false;
         Location location = new();
-        IList<PinballLocation> pinballLocations = null;
+        IList<PinballLocation>? pinballLocations = null;
 
         private async Task Submit()
         {               
             pinballLocations = new List<PinballLocation>();
-            pinballLocations = await GetPinballLocations(await GetClosestMachinesByLatLon(location.Latitude, location.Longitude));
-            //hasSubmit = true;
+            string matches = await GetClosestMachinesByLatLon(location.Latitude, location.Longitude);
+            pinballLocations = GetPinballLocations(matches);
         }
 
         // Services layer
@@ -30,14 +29,14 @@ namespace BlazorPinballLocations.Components.Pages
         }
 
         // Business layer
-        private Task<IList<PinballLocation>> GetPinballLocations(string json)
+        private IList<PinballLocation> GetPinballLocations(string json)
         {
-            pinballLocations.Clear();
+            pinballLocations?.Clear();
             using (JsonDocument document = JsonDocument.Parse(json))
             {
                 if (string.IsNullOrEmpty(json))
                 {
-                    return Task.FromResult<IList<PinballLocation>>(Enumerable.Empty<PinballLocation>().ToList());
+                    return Enumerable.Empty<PinballLocation>().ToList();
                 }
                 else
                 {
@@ -47,14 +46,14 @@ namespace BlazorPinballLocations.Components.Pages
                     {
                         foreach (JsonElement location in locationElement.EnumerateArray())
                         {
-                            pinballLocations.Add(JsonSerializer.Deserialize<PinballLocation>(location)!);
+                            pinballLocations?.Add(JsonSerializer.Deserialize<PinballLocation>(location)!);
                         }
 
-                        return Task.FromResult(pinballLocations);
+                        return pinballLocations ?? Enumerable.Empty<PinballLocation>().ToList();
                     }
                     else
                     {
-                        return Task.FromResult<IList<PinballLocation>>(Enumerable.Empty<PinballLocation>().ToList());
+                        return Enumerable.Empty<PinballLocation>().ToList();
                     }
                 }
             }
@@ -68,7 +67,6 @@ namespace BlazorPinballLocations.Components.Pages
             location.Latitude = currentPositionResult.Position.Coords.Latitude;
             location.Longitude = currentPositionResult.Position.Coords.Longitude;
             pinballLocations = null;
-            //hasSubmit = false;
         }
     }
 }
