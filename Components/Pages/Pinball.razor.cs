@@ -5,9 +5,8 @@ namespace BlazorPinballLocations.Components.Pages
 {
     public partial class Pinball
     {
-        bool isSubmitting = false;
-        Location location = new();
-        IList<PinballLocation>? pinballLocations = null;
+        private Location location = new();
+        private IList<PinballLocation>? pinballLocations = null;
 
         private async Task Submit()
         {   
@@ -37,7 +36,6 @@ namespace BlazorPinballLocations.Components.Pages
             return responseBody!;
         }
 
-        // Business layer
         private IList<PinballLocation> GetPinballLocations(string json)
         {
             pinballLocations?.Clear();
@@ -75,7 +73,7 @@ namespace BlazorPinballLocations.Components.Pages
             var currentPositionResult = await service.GetCurrentPosition();
             location.Latitude = currentPositionResult.Position.Coords.Latitude;
             location.Longitude = currentPositionResult.Position.Coords.Longitude;
-            pinballLocations = null;
+            pinballLocations = null; // set to null for state management so the correct text is displayed to the user after GetUserCoordinates is called
         }
     }
 }
