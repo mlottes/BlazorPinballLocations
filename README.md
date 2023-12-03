@@ -2,6 +2,9 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
+### Attribution
+This project utilizes the pinball map api from https://github.com/pinballmap/pbm. Credit to them for creating the API.
+
 ### Goals
 Learn Blazor. I haven't used it before and I wanted to play around with the new version and .NET 8. 
 
